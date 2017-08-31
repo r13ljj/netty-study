@@ -1,4 +1,4 @@
-package com.jonex.netty.test.unpack.base;
+package com.jonex.netty.test.unpack.fixedlength;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -20,12 +20,13 @@ public class BaseClientHandler extends SimpleChannelInboundHandler {
              + "of configuring and connecting all of Netty’s components to bring your learned about threading models in ge"
              + "neral and Netty’s threading model in particular, whose performance and consistency advantages we discuss"
              + "ed in detail In this chapter you general, we recommend Java Concurrency in Practice by Brian Goetz. Hi"
+                +System.getProperty("line.separator")
              + "s book will give We’ve reached an exciting point—in the next chapter we’ll discuss bootstrapping, the"
              + " process of configuring and connecting all of Netty’s components to bring your learned about threading "
              + "models in general and Netty’s threading model in particular, whose performance and consistency advantag"
              + "es we discussed in detailIn this chapter you general, we recommend Java Concurrency in Practice by Bri"
              + "an Goetz. His book will give We’ve reached an exciting point—in the next chapter;the counter is: 1 2222"
-             + "sdsa ddasd asdsadas dsadasdas").getBytes();*/
+             + "sdsa ddasd asdsadas dsadasdas"+System.getProperty("line.separator")).getBytes();*/
     }
 
     @Override
