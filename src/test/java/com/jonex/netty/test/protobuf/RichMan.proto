@@ -1,6 +1,6 @@
 package netty;
 
-option java_package = "com.jonex.netty.test.protobuf.demo";
+option java_package = "com.jonex.netty.test.protobuf";
 option java_outer_classname = "RichManProto";
 
 message RichMan {
