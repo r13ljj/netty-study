@@ -24,11 +24,12 @@ public abstract class ConnectionWatchDog extends ChannelHandlerAdapter implement
     private final String host;
     private final int port;
 
-    public ConnectionWatchDog(Timer timer, Bootstrap bootstrap, String host, int port) {
+    public ConnectionWatchDog(Timer timer, Bootstrap bootstrap, String host, int port, boolean retry) {
         this.timer = timer;
         this.bootstrap = bootstrap;
         this.host = host;
         this.port = port;
+        this.retry = retry;
     }
 
     @Override

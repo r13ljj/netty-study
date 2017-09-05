@@ -42,8 +42,7 @@ public class HeartbeatClientHandler extends ChannelHandlerAdapter {
         if ("Heartbeat".equals(message)){
             ctx.write("has read message from server");
             ctx.flush();
-        } else {
-            ReferenceCountUtil.release(msg);
         }
+        ReferenceCountUtil.release(msg);
     }
 }

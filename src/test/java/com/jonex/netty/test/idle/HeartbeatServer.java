@@ -20,6 +20,8 @@ import java.util.concurrent.TimeUnit;
  */
 public class HeartbeatServer {
 
+    private final AcceptorIdleStateTrigger idleStateTrigger = new AcceptorIdleStateTrigger();
+
     private int port;
 
     public HeartbeatServer(int port) {
@@ -38,6 +40,7 @@ public class HeartbeatServer {
                         protected void initChannel(SocketChannel ch) throws Exception {
                             //每隔5秒检测读超时
                             ch.pipeline().addLast(new IdleStateHandler(5, 0, 0, TimeUnit.SECONDS));
+                            ch.pipeline().addLast(idleStateTrigger);
                             ch.pipeline().addLast(new StringDecoder());
                             ch.pipeline().addLast(new StringEncoder());
                             ch.pipeline().addLast(new HeartbeatServerHandler());

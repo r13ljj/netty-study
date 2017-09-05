@@ -33,7 +33,7 @@ public class HeartbeatClient {
                 .channel(NioSocketChannel.class)
                 .option(ChannelOption.TCP_NODELAY, true)
                 .handler(new LoggingHandler(LogLevel.INFO));
-        final ConnectionWatchDog watchDog = new ConnectionWatchDog(timer, bootstrap, host, port) {
+        final ConnectionWatchDog watchDog = new ConnectionWatchDog(timer, bootstrap, host, port, true) {
             public ChannelHandler[] handlers() {
                 return new ChannelHandler[]{
                     this,
@@ -59,7 +59,7 @@ public class HeartbeatClient {
                 });
                 future = bootstrap.connect(host, port);
             }
-            future.sync();
+//            future.sync();
             future.channel().closeFuture().sync();
         } catch (Exception e) {
             throw new Exception("connenct fail ");

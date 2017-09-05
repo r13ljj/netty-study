@@ -21,7 +21,7 @@ public class ConnectorIdleStateTrigger extends ChannelHandlerAdapter {
         if (evt instanceof IdleStateEvent) {
             IdleStateEvent event = (IdleStateEvent)evt;
             if(event.state() == IdleState.WRITER_IDLE){
-                ctx.channel().writeAndFlush(HEARTBEAT_SIGNAL);
+                ctx.channel().writeAndFlush(HEARTBEAT_SIGNAL.duplicate());
             }
         } else {
             super.userEventTriggered(ctx, evt);
