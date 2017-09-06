@@ -27,6 +27,7 @@ public class HeartbeatClientHandler extends ChannelHandlerAdapter {
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         System.out.println("激活时间是："+new Date());
         System.out.println("HeartbeatClientHandler channelActive");
+        ctx.fireChannelActive();
     }
 
     @Override

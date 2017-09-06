@@ -31,7 +31,7 @@ public class HeartbeatClient {
         bootstrap = new Bootstrap();
         bootstrap.group(group)
                 .channel(NioSocketChannel.class)
-                .option(ChannelOption.TCP_NODELAY, true)
+                //.option(ChannelOption.TCP_NODELAY, true)
                 .handler(new LoggingHandler(LogLevel.INFO));
         final ConnectionWatchDog watchDog = new ConnectionWatchDog(timer, bootstrap, host, port, true) {
             public ChannelHandler[] handlers() {

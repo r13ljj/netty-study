@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit;
  * @Author jonex [r13ljj@gmail.com]
  * @Date 2017/9/5 17:02
  */
+@ChannelHandler.Sharable
 public abstract class ConnectionWatchDog extends ChannelHandlerAdapter implements TimerTask, ChannelHandlerHolder {
 
     private volatile boolean retry = true;
@@ -43,7 +44,7 @@ public abstract class ConnectionWatchDog extends ChannelHandlerAdapter implement
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         System.out.println("链路关闭");
         if (retry) {
-            System.out.println("链路关闭，重试连接");
+            System.out.println("链路关闭，重试连接retrys:"+retrys);
             if(retrys < 12){
                 retrys ++;
                 //重连的间隔时间会越来越长
