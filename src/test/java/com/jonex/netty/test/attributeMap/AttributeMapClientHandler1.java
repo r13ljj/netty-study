@@ -13,6 +13,7 @@ public class AttributeMapClientHandler1 extends ChannelHandlerAdapter{
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
+        //channelHandlerContext attributeMap
         Attribute<NettyChannel> attr = ctx.attr(AttributeMapConstant.NETTY_CHANNEL_CTX_KEY);
         NettyChannel nChannel = attr.get();
         if (nChannel == null) {
