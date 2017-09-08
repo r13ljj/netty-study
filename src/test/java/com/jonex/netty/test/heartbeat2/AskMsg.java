@@ -8,6 +8,10 @@ public class AskMsg extends BaseMsg {
     private AskParams params;
 
 
+    public AskMsg(){
+
+    }
+
     public AskMsg(AskParams params) {
         this.params = params;
         super.setType(MsgType.ASK);

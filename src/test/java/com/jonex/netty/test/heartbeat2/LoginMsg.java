@@ -10,6 +10,10 @@ public class LoginMsg extends BaseMsg {
 
     private String password;
 
+    public LoginMsg(){
+
+    }
+
     public LoginMsg(String userName, String password) {
         this.userName = userName;
         this.password = password;
