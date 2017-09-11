@@ -22,4 +22,8 @@ public class Heartbeats {
         HEARTBEAT_BUF = Unpooled.unmodifiableBuffer(Unpooled.unreleasableBuffer(buf));
     }
 
+    public static ByteBuf heartbeatContent(){
+        return HEARTBEAT_BUF.duplicate();
+    }
+
 }
