@@ -34,6 +34,10 @@ public abstract class ConnnectionWatchDog extends ChannelHandlerAdapter implemen
         this.port = port;
     }
 
+    public void canRetry(boolean flag){
+        this.retry = flag;
+    }
+
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         Channel channel = ctx.channel();
