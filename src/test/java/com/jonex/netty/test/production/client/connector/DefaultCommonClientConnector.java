@@ -121,6 +121,10 @@ public class DefaultCommonClientConnector extends NettyClientConnector {
         return channel;
     }
 
+    public void addNeedAckMessageInfo(MessageNonAck msgNonAck) {
+        messagesNonAcks.put(msgNonAck.getId(), msgNonAck);
+    }
+
 
 
     /**

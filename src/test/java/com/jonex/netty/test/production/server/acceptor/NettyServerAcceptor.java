@@ -38,7 +38,7 @@ public abstract class NettyServerAcceptor implements ServerAcceptor {
     private volatile ByteBufAllocator allocator;
 
     protected  final HashedWheelTimer timer = new HashedWheelTimer(new ThreadFactory() {
-        private AtomicInteger threadIndex;
+        private AtomicInteger threadIndex = new AtomicInteger(0);
         @Override
         public Thread newThread(Runnable r) {
             return new Thread(r,"NettySrvAcceptorExecutor_"+threadIndex.getAndIncrement());

@@ -26,6 +26,7 @@
         <protobuf.version>3.4.0</protobuf.version>
         <protostuff.version>1.6.0</protostuff.version>
         <objenesis.version>2.6</objenesis.version>
+        <logback.version>1.2.3</logback.version>
     </properties>
 
 
@@ -54,10 +55,23 @@
             <version>${slf4j.version}</version>
         </dependency>
         <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
             <version>${netty.version}</version>
         </dependency>
+
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
@@ -78,6 +92,7 @@
             <artifactId>objenesis</artifactId>
             <version>${objenesis.version}</version>
         </dependency>
+
     </dependencies>
 
 
