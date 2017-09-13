@@ -1,10 +1,7 @@
 package com.jonex.netty.test.production.client.connector;
 
 import com.jonex.netty.test.production.ConnnectionWatchDog;
-import com.jonex.netty.test.production.common.Acknowledge;
-import com.jonex.netty.test.production.common.Message;
-import com.jonex.netty.test.production.common.NativeSupport;
-import com.jonex.netty.test.production.common.NettyCommonProtocol;
+import com.jonex.netty.test.production.common.*;
 import com.jonex.netty.test.production.exception.ConnectFailedException;
 import com.jonex.netty.test.production.serializer.SerializerHolder;
 import com.jonex.netty.test.production.server.acceptor.AcknowledgeEncoder;
@@ -137,137 +134,16 @@ public class DefaultCommonClientConnector extends NettyClientConnector {
             if (msg instanceof Acknowledge) {
                 logger.info("收到server端的Ack信息，无需再次发送信息");
 
+            }else{
+                super.channelRead(ctx, msg);
             }
         }
     }
 
-    /**
-     * **************************************************************************************************
-     *                                          Protocol
-     *  ┌ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┐
-     *       2   │   1   │    1   │     8     │      4      │
-     *  ├ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┤
-     *           │       │        │           │             │
-     *  │  MAGIC   Sign    Status   Invoke Id   Body Length                   Body Content              │
-     *           │       │        │           │             │
-     *  └ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ┘
-     *
-     * 消息头16个字节定长
-     * = 2 // MAGIC = (short) 0xbabe
-     * + 1 // 消息标志位, 用来表示消息类型
-     * + 1 // 空
-     * + 8 // 消息 id long 类型
-     * + 4 // 消息体body长度, int类型
-     */
-    class MessageEncoder extends MessageToByteEncoder<Message>{
-
-        @Override
-        protected void encode(ChannelHandlerContext ctx, Message msg, ByteBuf out) throws Exception {
-            byte[] bytes = SerializerHolder.getSerializer().writeObject(msg);
-            out.writeShort(NettyCommonProtocol.MAGIC)
-                    .writeByte(msg.getSign())
-                    .writeByte(0)
-                    .writeLong(0)
-                    .writeInt(bytes.length)
-                    .writeBytes(bytes);
-        }
-    }
-
-    /**
-     * 消息解码
-     */
-    static class MessageDecoder extends ReplayingDecoder<MessageDecoder.State>{
-
-        enum State {
-            HEADER_MAGIC,
-            HEADER_SIGN,
-            HEADER_STATUS,
-            HEADER_ID,
-            HEADER_BODY_LENGTH,
-            BODY
-        }
-
-        private final NettyCommonProtocol header = new NettyCommonProtocol();
 
 
-        public MessageDecoder(){
-            super(State.HEADER_MAGIC);
-        }
 
-        @Override
-        protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
-            switch (super.state()){
-                case HEADER_MAGIC:
-                    checkMagic(in.readShort());
-                    checkpoint(State.HEADER_SIGN);
-                case HEADER_SIGN:
-                    header.setSign(in.readByte());
-                    checkpoint(State.HEADER_STATUS);
-                case HEADER_STATUS:
-                    header.setStatus(in.readByte());
-                    checkpoint(State.HEADER_ID);
-                case HEADER_ID:
-                    header.setId(in.readLong());
-                    checkpoint(State.HEADER_BODY_LENGTH);
-                case HEADER_BODY_LENGTH:
-                    header.setBodyLength(in.readInt());
-                    checkpoint(State.BODY);
-                case BODY:
-                    switch (header.getSign()) {
-                        case NettyCommonProtocol.RESPONSE:
-                        case NettyCommonProtocol.SERVICE_1:
-                        case NettyCommonProtocol.SERVICE_2:
-                        case NettyCommonProtocol.SERVICE_3: {
-                            byte[] bytes = new byte[header.getBodyLength()];
-                            in.readBytes(bytes);
 
-                            Message msg = SerializerHolder.getSerializer().readObject(bytes, Message.class);
-                            msg.setSign((short)header.getSign());
-                            out.add(msg);
-
-                            break;
-                        }
-                        case NettyCommonProtocol.ACK: {
-                            byte[] bytes = new byte[header.getBodyLength()];
-                            in.readBytes(bytes);
-
-                            Acknowledge ack = SerializerHolder.getSerializer().readObject(bytes, Acknowledge.class);
-                            out.add(ack);
-                            break;
-                        }
-                        default:
-                            throw new IllegalArgumentException();
-
-                    }
-                    checkpoint(State.HEADER_MAGIC);
-
-            }
-        }
-
-        private static void checkMagic(short magic){
-            if (magic != NettyCommonProtocol.MAGIC) {
-                throw new IllegalArgumentException("unknow protocol header magic:"+magic);
-            }
-        }
-    }
-
-    /**
-     * 不用ack消息
-     */
-    public static class MessageNonAck {
-        private final long id;
-
-        private final Message msg;
-        private final Channel channel;
-        private final long timestamp = System.currentTimeMillis();
-
-        public MessageNonAck(Message msg, Channel channel) {
-            this.msg = msg;
-            this.channel = channel;
-
-            id = msg.getSequence();
-        }
-    }
 
     /**
      * ack超时扫描任务
@@ -281,7 +157,7 @@ public class DefaultCommonClientConnector extends NettyClientConnector {
         }
 
         public void addNeedAckMessageInfo(MessageNonAck msgNonAck) {
-            messagesNonAcks.put(msgNonAck.id, msgNonAck);
+            messagesNonAcks.put(msgNonAck.getId(), msgNonAck);
         }
 
         @Override
@@ -289,16 +165,16 @@ public class DefaultCommonClientConnector extends NettyClientConnector {
             for(;;){
                 try{
                     for (MessageNonAck m : messagesNonAcks.values()) {
-                        if (System.currentTimeMillis()-m.timestamp > TimeUnit.SECONDS.toMillis(10)) {
+                        if (System.currentTimeMillis()-m.getTimestamp() > TimeUnit.SECONDS.toMillis(10)) {
                             //移除
-                            if (messagesNonAcks.remove(m.id) == null){
+                            if (messagesNonAcks.remove(m.getId()) == null){
                                 continue;
                             }
-                            if (m.channel.isActive()) {
+                            if (m.getChannel().isActive()) {
                                 logger.warn("准备重新发送信息");
-                                MessageNonAck msgNonAck = new MessageNonAck(m.msg, m.channel);
-                                messagesNonAcks.put(msgNonAck.id, msgNonAck);
-                                m.channel.writeAndFlush(m.msg)
+                                MessageNonAck msgNonAck = new MessageNonAck(m.getMsg(), m.getChannel());
+                                messagesNonAcks.put(msgNonAck.getId(), msgNonAck);
+                                m.getChannel().writeAndFlush(m.getMsg())
                                         .addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
                             }
                         }
