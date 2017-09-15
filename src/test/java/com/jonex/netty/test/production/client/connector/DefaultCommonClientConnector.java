@@ -74,7 +74,7 @@ public class DefaultCommonClientConnector extends NettyClientConnector {
 
     @Override
     protected EventLoopGroup initEventLoopGroup(int nWorkers, ExecutorServiceFactory workerFactory) {
-        return NativeSupport.isSupportNativeEt() ? new EpollEventLoopGroup(nWorkers, workerFactory) : new NioEventLoopGroup(nWorkers, workerFactory);
+        return NativeSupport.isLinuxPlatform() ? new EpollEventLoopGroup(nWorkers, workerFactory) : new NioEventLoopGroup(nWorkers, workerFactory);
     }
 
     @Override
@@ -135,12 +135,19 @@ public class DefaultCommonClientConnector extends NettyClientConnector {
 
         @Override
         public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+            logger.info("client connector handler remote:{}", ctx.channel().remoteAddress());
             if (msg instanceof Acknowledge) {
                 logger.info("收到server端的Ack信息，无需再次发送信息");
 
             }else{
                 super.channelRead(ctx, msg);
             }
+        }
+
+        @Override
+        public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+            logger.info("default acceptor client connector exception", cause);
+            ctx.close();
         }
     }
 

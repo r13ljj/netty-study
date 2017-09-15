@@ -109,7 +109,7 @@ public class DefaultCommonServerAcceptor extends DefaultNettyServerAcceptor {
 
     @Override
     protected EventLoopGroup initEventLoopGroup(int nthread, ExecutorServiceFactory bossFactory) {
-        return NativeSupport.isSupportNativeEt() ? new EpollEventLoopGroup(nthread, bossFactory) : new NioEventLoopGroup(nthread, bossFactory);
+        return NativeSupport.isLinuxPlatform() ? new EpollEventLoopGroup(nthread, bossFactory) : new NioEventLoopGroup(nthread, bossFactory);
     }
 
     @Override
@@ -142,6 +142,12 @@ public class DefaultCommonServerAcceptor extends DefaultNettyServerAcceptor {
         protected void messageReceived(ChannelHandlerContext ctx, Message msg) throws Exception {
             logger.info("default common server acceptor MessageHandler channelRead msg:"+msg);
             ctx.channel().writeAndFlush(new Acknowledge(msg.getSequence()));
+        }
+
+        @Override
+        public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+            logger.info("default common server acceptor exception", cause);
+            ctx.close();
         }
     }
 

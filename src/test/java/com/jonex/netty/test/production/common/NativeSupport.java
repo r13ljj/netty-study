@@ -6,16 +6,21 @@ package com.jonex.netty.test.production.common;
 public final class NativeSupport {
 
     private final static boolean SUPPORT_NATIVE_ET;
+    public static final String OS_NAME = System.getProperty("os.name");
+    private static boolean isLinuxPlatform = false;
 
     static {
         boolean epoll = false;
-        try{
+        /*try{
             Class.forName("io.netty.channel.epoll.Native");
             epoll = true;
         }catch (Exception e){
             epoll = false;
-        }
+        }*/
         SUPPORT_NATIVE_ET = epoll;
+        if (OS_NAME != null && OS_NAME.toLowerCase().indexOf("linux") >= 0) {
+            isLinuxPlatform = true;
+        }
     }
 
     /**
@@ -23,6 +28,10 @@ public final class NativeSupport {
      */
     public static boolean isSupportNativeEt(){
         return SUPPORT_NATIVE_ET;
+    }
+
+    public static boolean isLinuxPlatform() {
+        return isLinuxPlatform;
     }
 
 }

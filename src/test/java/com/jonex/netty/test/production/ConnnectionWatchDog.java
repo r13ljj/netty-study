@@ -48,6 +48,7 @@ public abstract class ConnnectionWatchDog extends ChannelHandlerAdapter implemen
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        logger.info("channel inactive:{}, port: {},host {}.", ctx.channel(), ctx.channel(), port,host);
         boolean doRetry = retry;
         if (doRetry) {
             if (retrys < 12) {
