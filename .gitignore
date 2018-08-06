@@ -1,0 +1,42 @@
+# Eclipse project files
+.project
+.classpath
+.settings/
+
+# IntelliJ IDEA project files and directories
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# Build targets
+target/
+*/target/
+
+# temp ignore
+*.log
+*.cache
+*.diff
+*.patch
+*.tmp
+*.java~
+*.properties~
+*.xml~
+
+# maven ignore
+target/
+*.jar
+*.war
+*.zip
+*.tar
+*.tar.gz
+
+
+# Mac-specific directory that no other operating system needs.
+.DS_Store
+# system ignore
+Thumbs.db
+
+# JVM crash logs
+hs_err_pid*.log
+
